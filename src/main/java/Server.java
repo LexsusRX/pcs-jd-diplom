@@ -4,7 +4,7 @@ import com.google.gson.GsonBuilder;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
+import java.net.SocketException;
 import java.util.List;
 
 
@@ -18,28 +18,25 @@ public class Server {
 
     public void startServer() throws IOException {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            Socket clientSocket = serverSocket.accept(); // ждем подключения от client
-            System.out.println("Установлено подключение с " + serverSocket.getLocalSocketAddress());
             BufferedReader in;
             PrintWriter out;
 
             while (true) {
-
+                Socket clientSocket = serverSocket.accept(); // ждем подключения от client
+                System.out.println("Установлено подключение с " + serverSocket.getLocalSocketAddress());
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 out = new PrintWriter(clientSocket.getOutputStream(), true);
 
                 out.println("Введите слово для поиска в формате <<слово>> (для выхода введите *end*) : ");
                 String clientData = in.readLine();
-
                 if (clientData != null) {
                     System.out.println("Введены данные: " + clientData);
-
                     if ("*end*".equals(clientData)) {
-                        serverSocket.close();
                         System.out.println("Соединение закрыто");
                         out.println("Соединение закрыто");
                         out.close();
                         in.close();
+                        serverSocket.close();
                         break;
                     } else if (clientData.startsWith("<<") && clientData.endsWith(">>")) {
                         String clientWord = clientData.substring(2, clientData.length() - 2);
@@ -52,12 +49,14 @@ public class Server {
                                 .map(gson::toJson)
                                 .map(Object::toString).toList());
                         out.println(resultList + "\n");
+                        clientSocket.close();
                     }
                     continue;
                 }
+                continue;
             }
-        } catch (SocketTimeoutException s) {
-            System.out.println("Время соединения истекло!");
+        } catch (SocketException s) {
+            System.out.println(s);
         }
     }
 }

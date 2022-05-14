@@ -1,22 +1,22 @@
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Scanner;
 
 public class Client {
     static int port = 8989;
     static String host = "localhost";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SocketException {
 
         Scanner scanner = new Scanner(System.in);
         try {
-            Socket clientSocket = new Socket(host, port);
-            System.out.println("Подключено " + clientSocket.getRemoteSocketAddress() + "\n");
-
             BufferedReader in;
             PrintWriter out;
 
             while (true) {
+                Socket clientSocket = new Socket(host, port);
+                System.out.println("Подключено " + clientSocket.getRemoteSocketAddress() + "\n");
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 out = new PrintWriter(clientSocket.getOutputStream(), true);
 
@@ -28,9 +28,11 @@ public class Client {
                         System.out.print("Сеанс закончен");
                         in.close();
                         out.close();
+                        clientSocket.close();
                         break;
-                    } else {
+                    } else if (userData.startsWith("<<") && userData.endsWith(">>")) {
                         out.println(userData);
+                        System.out.println(in.readLine());
                     }
                 }
             }
