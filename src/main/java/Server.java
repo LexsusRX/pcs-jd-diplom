@@ -5,6 +5,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.text.ParseException;
 import java.util.List;
 
 
@@ -17,31 +18,23 @@ public class Server {
     }
 
     public void startServer() throws IOException {
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
+        try {
+            ServerSocket serverSocket = new ServerSocket(port);
             BufferedReader in;
             PrintWriter out;
 
             while (true) {
-                Socket clientSocket = serverSocket.accept(); // ждем подключения от client
-                System.out.println("Установлено подключение с " + serverSocket.getLocalSocketAddress());
-                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                out = new PrintWriter(clientSocket.getOutputStream(), true);
+                try {
+                    Socket clientSocket = serverSocket.accept(); // ждем подключения от client
+                    System.out.println("Установлено подключение с " + serverSocket.getLocalSocketAddress());
+                    in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                    out = new PrintWriter(clientSocket.getOutputStream(), true);
 
-                out.println("Введите слово для поиска в формате <<слово>> (для выхода введите *end*) : ");
-                String clientData = in.readLine();
-                if (clientData != null) {
-                    System.out.println("Введены данные: " + clientData);
-                    if ("*end*".equals(clientData)) {
-                        System.out.println("Соединение закрыто");
-                        out.println("Соединение закрыто");
-                        out.close();
-                        in.close();
-                        serverSocket.close();
-                        break;
-                    } else if (clientData.startsWith("<<") && clientData.endsWith(">>")) {
-                        String clientWord = clientData.substring(2, clientData.length() - 2);
-                        System.out.println("Выполняется поиск слова: " + clientWord);
-                        List<PageEntry> searchResult = searchEngine.search(clientWord);
+                    out.println("Введите слово для поиска:");
+                    String clientData = in.readLine();
+                    if (clientData != null) {
+                        List<PageEntry> searchResult = searchEngine.search(clientData);
+
                         GsonBuilder builder = new GsonBuilder();
                         Gson gson = builder.create();
                         String resultList = String.valueOf(searchResult
@@ -51,11 +44,11 @@ public class Server {
                         out.println(resultList + "\n");
                         clientSocket.close();
                     }
-                    continue;
+                } catch (SocketException e) {
+                    System.out.println(e);
                 }
-                continue;
             }
-        } catch (SocketException s) {
+        } catch (IOException s) {
             System.out.println(s);
         }
     }

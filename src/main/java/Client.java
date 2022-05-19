@@ -7,7 +7,7 @@ public class Client {
     static int port = 8989;
     static String host = "localhost";
 
-    public static void main(String[] args) throws SocketException {
+    public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
         try {
@@ -22,19 +22,8 @@ public class Client {
 
                 System.out.println(in.readLine());
                 String userData = scanner.nextLine();
-                if (userData != null) {
-                    if (userData.equals("*end*")) {
-                        out.println("*end*");
-                        System.out.print("Сеанс закончен");
-                        in.close();
-                        out.close();
-                        clientSocket.close();
-                        break;
-                    } else if (userData.startsWith("<<") && userData.endsWith(">>")) {
-                        out.println(userData);
-                        System.out.println(in.readLine());
-                    }
-                }
+                out.println(userData);
+                System.out.println(in.readLine());
             }
         } catch (IOException e) {
             e.printStackTrace();
