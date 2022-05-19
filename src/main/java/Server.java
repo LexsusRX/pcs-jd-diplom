@@ -5,7 +5,6 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.text.ParseException;
 import java.util.List;
 
 
@@ -34,7 +33,6 @@ public class Server {
                     String clientData = in.readLine();
                     if (clientData != null) {
                         List<PageEntry> searchResult = searchEngine.search(clientData);
-
                         GsonBuilder builder = new GsonBuilder();
                         Gson gson = builder.create();
                         String resultList = String.valueOf(searchResult

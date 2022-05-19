@@ -13,17 +13,15 @@ public class Client {
             BufferedReader in;
             PrintWriter out;
 
-            while (true) {
-                Socket clientSocket = new Socket(host, port);
-                System.out.println("Подключено " + clientSocket.getRemoteSocketAddress() + "\n");
-                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                out = new PrintWriter(clientSocket.getOutputStream(), true);
+            Socket clientSocket = new Socket(host, port);
+            System.out.println("Подключено " + clientSocket.getRemoteSocketAddress() + "\n");
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            out = new PrintWriter(clientSocket.getOutputStream(), true);
 
-                System.out.println(in.readLine());
-                String userData = scanner.nextLine();
-                out.println(userData);
-                System.out.println(in.readLine());
-            }
+            System.out.println(in.readLine());
+            String userData = scanner.nextLine();
+            out.println(userData);
+            System.out.println(in.readLine());
         } catch (IOException e) {
             e.printStackTrace();
         }
