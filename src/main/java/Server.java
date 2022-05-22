@@ -17,17 +17,13 @@ public class Server {
     }
 
     public void startServer() throws IOException {
-        try {
-            ServerSocket serverSocket = new ServerSocket(port);
-            BufferedReader in;
-            PrintWriter out;
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
 
             while (true) {
-                try {
-                    Socket clientSocket = serverSocket.accept(); // ждем подключения от client
+                try (Socket clientSocket = serverSocket.accept(); // ждем подключения от client
+                     BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                     PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
                     System.out.println("Установлено подключение с " + serverSocket.getLocalSocketAddress());
-                    in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                    out = new PrintWriter(clientSocket.getOutputStream(), true);
 
                     out.println("Введите слово для поиска:");
                     String clientData = in.readLine();
@@ -42,11 +38,9 @@ public class Server {
                         out.println(resultList + "\n");
                         clientSocket.close();
                     }
-                } catch (SocketException e) {
-                    System.out.println(e);
                 }
             }
-        } catch (IOException s) {
+        } catch (SocketException s) {
             System.out.println(s);
         }
     }

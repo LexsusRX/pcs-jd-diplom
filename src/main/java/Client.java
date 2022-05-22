@@ -9,14 +9,10 @@ public class Client {
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
-        try {
-            BufferedReader in;
-            PrintWriter out;
-
-            Socket clientSocket = new Socket(host, port);
+        try (Socket clientSocket = new Socket(host, port);
+             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
             System.out.println("Подключено " + clientSocket.getRemoteSocketAddress() + "\n");
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
 
             System.out.println(in.readLine());
             String userData = scanner.nextLine();
